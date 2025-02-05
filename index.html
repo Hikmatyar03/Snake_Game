@@ -30,10 +30,6 @@
       padding: 10px;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      perspective: 1000px;
-      will-change: transform;
     }
     .cell {
       width: 20px;
@@ -50,9 +46,7 @@
       border-radius: 3px;
       box-shadow: 0 0 5px rgba(76, 175, 80, 0.8);
       border: 1px solid #45a049;
-      animation: glow 1s ease-in-out infinite alternate;
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: transform, background-color;
+      animation: glow 0.5s ease-in-out infinite alternate;
     }
     @keyframes glow {
       from {
@@ -60,7 +54,7 @@
         background-color: #4CAF50;
       }
       to {
-        box-shadow: 0 0 15px rgba(76, 175, 80, 1);
+        box-shadow: 0 0 10px rgba(76, 175, 80, 1);
         background-color: #45a049;
       }
     }
@@ -68,12 +62,11 @@
       background-color: #FF4444;
       border-radius: 50%;
       box-shadow: 0 0 5px rgba(255, 68, 68, 0.5);
-      animation: bounce 1s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-      will-change: transform;
+      animation: bounce 0.5s infinite alternate;
     }
     @keyframes bounce {
-      from { transform: scale(0.9); }
-      to { transform: scale(1.1); }
+      from { transform: scale(1); }
+      to { transform: scale(1.2); }
     }
     .wall {
       background-color: #666;
@@ -807,6 +800,13 @@
             return;
         }
 
+        // Add check for tiktoker gender
+        if (document.getElementById('playerGender').value === 'tiktoker') {
+            const gaySound = new Audio('gay.mp3');
+            gaySound.play()
+                .catch(error => console.log("Audio playback failed:", error));
+        }
+
         playerData = {
             name: document.getElementById('playerName').value,
             gender: document.getElementById('playerGender').value,
@@ -1030,20 +1030,12 @@
         
         const head = { ...snake[0] };
         
-        // Calculate new head position with smoother wrapping
+        // Calculate new head position
         switch (direction) {
-            case 'UP': 
-                head.y = (head.y - 1 + HEIGHT) % HEIGHT;
-                break;
-            case 'DOWN': 
-                head.y = (head.y + 1) % HEIGHT;
-                break;
-            case 'LEFT': 
-                head.x = (head.x - 1 + WIDTH) % WIDTH;
-                break;
-            case 'RIGHT': 
-                head.x = (head.x + 1) % WIDTH;
-                break;
+            case 'UP': head.y = (head.y - 1 + HEIGHT) % HEIGHT; break;
+            case 'DOWN': head.y = (head.y + 1) % HEIGHT; break;
+            case 'LEFT': head.x = (head.x - 1 + WIDTH) % WIDTH; break;
+            case 'RIGHT': head.x = (head.x + 1) % WIDTH; break;
         }
 
         // Check for collisions
@@ -1053,28 +1045,25 @@
             return;
         }
 
-        // Update snake position with smooth transition
+        // Update snake position
         snake.unshift(head);
-        requestAnimationFrame(() => {
-            grid[head.y][head.x].classList.add('snake');
-        });
+        grid[head.y][head.x].classList.add('snake');
 
         // Check for food
         if (head.x === food.x && head.y === food.y) {
             score++;
             document.getElementById('score').textContent = score;
             placeFood();
+            // Check level completion after scoring
             checkLevelCompletion();
         } else {
             const tail = snake.pop();
             if (tail) {
-                requestAnimationFrame(() => {
-                    grid[tail.y][tail.x].classList.remove('snake');
-                });
+                grid[tail.y][tail.x].classList.remove('snake');
             }
         }
 
-        // Update AI snakes with smooth movement
+        // Update AI snakes if enabled
         if (playerData.enableAISnakes) {
             requestAnimationFrame(() => {
                 aiSnakes.forEach(aiSnake => aiSnake.move());
@@ -1087,23 +1076,9 @@
         if (gameInterval) {
             clearInterval(gameInterval);
         }
-        
-        let lastTime = 0;
-        const gameLoop = (timestamp) => {
-            if (!isPaused && !isGameOver) {
-                if (!lastTime) lastTime = timestamp;
-                const elapsed = timestamp - lastTime;
-                
-                if (elapsed > speed) {
-                    update();
-                    lastTime = timestamp;
-                }
-                
-                requestAnimationFrame(gameLoop);
-            }
-        };
-        
-        requestAnimationFrame(gameLoop);
+        gameInterval = setInterval(() => {
+            requestAnimationFrame(update);
+        }, speed);
     }
 
     function updateStoryMode() {
@@ -1215,32 +1190,28 @@
         )) {
             gameStarted = true;
             waitingForStart = false;
-            requestAnimationFrame(() => {
-                switch (e.key) {
-                    case 'ArrowUp': direction = 'UP'; break;
-                    case 'ArrowDown': direction = 'DOWN'; break;
-                    case 'ArrowLeft': direction = 'LEFT'; break;
-                    case 'ArrowRight': direction = 'RIGHT'; break;
-                }
-            });
+            switch (e.key) {
+                case 'ArrowUp': direction = 'UP'; break;
+                case 'ArrowDown': direction = 'DOWN'; break;
+                case 'ArrowLeft': direction = 'LEFT'; break;
+                case 'ArrowRight': direction = 'RIGHT'; break;
+            }
             return;
         }
 
         if (gameStarted) {
-            requestAnimationFrame(() => {
-                switch (e.key) {
-                    case 'ArrowUp': if (direction !== 'DOWN') direction = 'UP'; break;
-                    case 'ArrowDown': if (direction !== 'UP') direction = 'DOWN'; break;
-                    case 'ArrowLeft': if (direction !== 'RIGHT') direction = 'LEFT'; break;
-                    case 'ArrowRight': if (direction !== 'LEFT') direction = 'RIGHT'; break;
-                }
-            });
+            switch (e.key) {
+                case 'ArrowUp': if (direction !== 'DOWN') direction = 'UP'; break;
+                case 'ArrowDown': if (direction !== 'UP') direction = 'DOWN'; break;
+                case 'ArrowLeft': if (direction !== 'RIGHT') direction = 'LEFT'; break;
+                case 'ArrowRight': if (direction !== 'LEFT') direction = 'RIGHT'; break;
+            }
         }
 
         if (e.key === ' ' || e.key === 'p') {
             togglePause();
         }
-    }, { passive: true });
+    });
 
     function togglePause() {
       if (!isGameOver) {
