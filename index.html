@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snake Game by Hikmtyar</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+    :root {
+      --primary-color: #4CAF50;
+      --secondary-color: #2196F3;
+      --accent-color: #FF4444;
+      --background-dark: #1a1a1a;
+      --text-light: #ffffff;
+      --modal-bg: rgba(42, 42, 42, 0.95);
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
@@ -472,36 +484,556 @@
       50% { transform: translate(-50%, -50%) scale(1.1); }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     }
+
+    .game-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .player-info {
+      display: flex;
+      gap: 20px;
+      font-size: 1.2em;
+    }
+
+    .game-stats {
+      display: flex;
+      gap: 30px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2em;
+    }
+
+    .game-modal {
+      background: var(--modal-bg);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      border: 2px solid var(--primary-color);
+      animation: modalAppear 0.5s ease-out;
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .modal-header h2 {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--primary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-group.animated {
+      transform: translateY(20px);
+      opacity: 0;
+      animation: slideUp 0.5s forwards;
+    }
+
+    .custom-select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid var(--primary-color);
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .custom-select:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .mode-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .mode-button {
+      padding: 20px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mode-button i {
+      font-size: 24px;
+    }
+
+    .mode-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .start-button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 30px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary-color);
+      color: white;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    .start-button:hover {
+      background: #45a049;
+      transform: scale(1.05);
+    }
+
+    @keyframes modalAppear {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Add animation delays for form groups */
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+    .game-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .game-container {
+      margin: 20px 0;
+      border: 3px solid var(--primary-color);
+      border-radius: 15px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Update existing button styles */
+    .button {
+      padding: 12px 25px;
+      background: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8em;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Add difficulty section styles */
+    #difficultySection {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .difficulty-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .difficulty-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .game-ui {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .health-bars {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .health-bar {
+      width: 300px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .health-label {
+      color: white;
+      margin-bottom: 5px;
+      font-size: 14px;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    .health-container {
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .health-fill {
+      height: 100%;
+      width: 100%;
+      transition: width 0.3s ease-in-out;
+      position: absolute;
+    }
+
+    .player-health .health-fill {
+      background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    }
+
+    .enemy-health .health-fill {
+      background: linear-gradient(90deg, #f44336, #ff5722);
+    }
+
+    .health-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      line-height: 20px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .power-up-display {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .power-up-slot {
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .power-up-slot.active {
+      border-color: #4CAF50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    .status-effects {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .status-effect {
+      width: 40px;
+      height: 40px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      animation: pulse 1s infinite;
+    }
+
+    .power-orb {
+      border-radius: 50%;
+      animation: float 2s infinite ease-in-out;
+    }
+
+    .power-orb.health { background: radial-gradient(#4CAF50, #2E7D32); }
+    .power-orb.damage { background: radial-gradient(#f44336, #B71C1C); }
+    .power-orb.speed { background: radial-gradient(#FFEB3B, #F57F17); }
+    .power-orb.shield { background: radial-gradient(#2196F3, #1565C0); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    /* Combat Effects */
+    .snake.attacking {
+      filter: brightness(1.5);
+      animation: attack 0.3s ease-in-out;
+    }
+
+    .snake.damaged {
+      animation: damage 0.3s ease-in-out;
+    }
+
+    .snake.shielded {
+      box-shadow: 0 0 15px rgba(33, 150, 243, 0.8);
+    }
+
+    @keyframes attack {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes damage {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(2) saturate(2); }
+    }
+
+    /* Power-up Effects */
+    .power-up-effect {
+      position: absolute;
+      pointer-events: none;
+      animation: fadeOut 1s forwards;
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+
+    /* Add enemies.css styles */
+    .enemy {
+        background-color: #ff4444;
+        border-radius: 3px;
+        box-shadow: 0 0 5px rgba(255, 68, 68, 0.8);
+        animation: enemyPulse 1s infinite;
+    }
+
+    .boss-enemy {
+        background-color: #c0392b;
+        box-shadow: 0 0 10px rgba(192, 57, 43, 0.8);
+        transform: scale(1.2);
+    }
+
+    .mission-overlay {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.95);
+        padding: 30px;
+        border-radius: 15px;
+        color: white;
+        max-width: 600px;
+        text-align: left;
+        z-index: 1000;
+        border: 3px solid #4CAF50;
+    }
+
+    .mission-instructions ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .mission-instructions li {
+        margin: 10px 0;
+        padding-left: 20px;
+        position: relative;
+    }
+
+    .mission-instructions li:before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: #4CAF50;
+    }
+
+    .warning {
+        background: rgba(255, 68, 68, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 20px;
+        text-align: center;
+        color: #ff4444;
+    }
+
+    @keyframes enemyPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .level-complete, .game-complete {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 1000;
+        color: white;
+        border: 3px solid #4CAF50;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .level-complete h2, .game-complete h2 {
+        color: #4CAF50;
+        margin-bottom: 20px;
+    }
+
+    .level-complete p, .game-complete p {
+        margin: 10px 0;
+        font-size: 1.2em;
+    }
+
+    .level-complete button, .game-complete button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.1em;
+        background: #4CAF50;
+        border: none;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .level-complete button:hover, .game-complete button:hover {
+        background: #45a049;
+        transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translate(-50%, -60%); }
+        to { opacity: 1; transform: translate(-50%, -50%); }
+    }
   </style>
 </head>
 <body>
-  <div id="welcomeModal" class="modal-overlay">
-    <div class="modal">
-      <h2>Welcome to Snake Game!</h2>
-      <form id="playerForm" onsubmit="startGame(event)">
-        <div class="form-group">
-          <label>Name Of Samp:</label>
-          <input type="text" id="playerName" required>
+  <div class="game-wrapper">
+    <div class="game-header">
+      <div class="player-info">
+        <span class="player-name">Player: <span id="displayName"></span></span>
+        <span class="player-level">Level: <span id="displayLevel">1</span></span>
+      </div>
+      <div class="game-stats">
+        <div class="stat">
+          <i class="fas fa-star"></i>
+          <span id="score">0</span>
         </div>
-        <div class="form-group">
-          <label>Gender:</label>
-          <select id="playerGender" required>
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+        <div class="stat">
+          <i class="fas fa-trophy"></i>
+          <span id="highScore">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-content">
+      <h1>Snake Adventure</h1>
+      <div class="game-container" id="game-container"></div>
+      <div class="score">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></div>
+      <div class="controls">
+        <button class="button" onclick="resetGame()">New Game</button>
+        <button class="button" onclick="togglePause()">Pause</button>
+      </div>
+    </div>
+
+  <div id="welcomeModal" class="modal-overlay">
+      <div class="modal game-modal">
+        <div class="modal-header">
+          <h2>🐍 Welcome to Snake Adventure! 🎮</h2>
+        </div>
+      <form id="playerForm" onsubmit="startGame(event)">
+          <div class="form-group animated">
+            <label>Name your Snake:</label>
+            <input type="text" id="playerName" required placeholder="Enter your name...">
+        </div>
+          <div class="form-group animated">
+            <label>Choose Your Identity:</label>
+            <select id="playerGender" required class="custom-select">
+              <option value="">Select Identity</option>
+              <option value="male">Warrior</option>
+              <option value="female">Huntress</option>
             <option value="tiktoker">TikToker</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Why do you want to play?</label>
-          <textarea id="playReason" required rows="3"></textarea>
+          <div class="form-group animated">
+            <label>What did He/She did :</label>
+            <textarea id="playReason" required rows="3" placeholder="Why do you seek this adventure?"></textarea>
         </div>
-        <div class="form-group">
-          <label>Select Game Mode:</label>
+          <div class="form-group animated">
+            <label>Choose Your Path:</label>
           <div class="mode-buttons">
-            <button type="button" class="mode-button story" onclick="selectMode('story')">Story Mode</button>
-            <button type="button" class="mode-button levels" onclick="selectMode('levels')">Level Mode</button>
-            <button type="button" class="mode-button free" onclick="selectMode('free')">Free Mode</button>
+              <button type="button" class="mode-button story" onclick="selectMode('story')">
+                <i class="fas fa-book"></i>
+                Story Mode
+              </button>
+              <button type="button" class="mode-button levels" onclick="selectMode('levels')">
+                <i class="fas fa-layer-group"></i>
+                Level Mode
+              </button>
+              <button type="button" class="mode-button free" onclick="selectMode('free')">
+                <i class="fas fa-infinity"></i>
+                Free Mode
+              </button>
           </div>
         </div>
         <div class="form-group" id="difficultySection" style="display: none;">
@@ -518,8 +1050,9 @@
             Enable AI Snakes
           </label>
         </div>
-        <button type="submit" class="button">Start Game</button>
+          <button type="submit" class="start-button">Begin Adventure!</button>
       </form>
+      </div>
     </div>
   </div>
 
@@ -531,12 +1064,34 @@
     </div>
   </div>
 
-  <h1>Snake Game by Hikmtyar</h1>
-  <div class="game-container" id="game-container"></div>
-  <div class="score">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></div>
-  <div class="controls">
-    <button class="button" onclick="resetGame()">New Game</button>
-    <button class="button" onclick="togglePause()">Pause</button>
+  <div class="game-ui">
+    <!-- Health Bars -->
+    <div class="health-bars">
+      <div class="health-bar player-health">
+        <div class="health-label">Your Health</div>
+        <div class="health-container">
+          <div class="health-fill" id="playerHealthFill"></div>
+          <span class="health-text" id="playerHealthText">100/100</span>
+        </div>
+      </div>
+      <div class="health-bar enemy-health">
+        <div class="health-label">Enemy Health</div>
+        <div class="health-container">
+          <div class="health-fill" id="enemyHealthFill"></div>
+          <span class="health-text" id="enemyHealthText">50/50</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Power-up Display -->
+    <div class="power-up-display">
+      <div class="power-up-slot" id="powerSlot1"></div>
+      <div class="power-up-slot" id="powerSlot2"></div>
+      <div class="power-up-slot" id="powerSlot3"></div>
+    </div>
+
+    <!-- Status Effects -->
+    <div class="status-effects" id="statusEffects"></div>
   </div>
 
   <script>
@@ -567,183 +1122,40 @@
 
     const LEVELS = [
         {
-            title: "Level 1: Baby Snake",
-            intro: "Take your first steps...",
-            walls: 0,
-            aiSnakes: 0,
-            target: 3,
-            speed: BASE_SPEED     // Standard speed
-        },
-        {
-            title: "Level 2: Growing Up",
-            intro: "A bit more challenging...",
-            walls: 0.02,
-            aiSnakes: 0,
+            title: "Level 1: First Steps",
+            intro: "Welcome! Collect food to grow longer.",
             target: 5,
-            speed: BASE_SPEED - 10
+            speed: BASE_SPEED
         },
         {
-            title: "Level 3: Explorer",
-            intro: "Watch out for the walls...",
-            walls: 0.03,       // 3% walls
-            aiSnakes: 1,
-            target: 7,
+            title: "Level 2: Getting Tougher",
+            intro: "Watch out for walls!",
+            target: 8,
             speed: BASE_SPEED - 20
         },
         {
-            title: "Level 4: Snake Friends",
-            intro: "Meet other snakes...",
-            walls: 0.03,
-            aiSnakes: 1,
-            target: 8,
-            speed: BASE_SPEED - 30
-        },
-        {
-            title: "Level 5: Maze Runner",
-            intro: "Navigate through the maze...",
-            walls: 0.04,       // 4% walls
-            aiSnakes: 1,
+            title: "Level 3: Final Challenge",
+            intro: "Can you reach the target?",
             target: 10,
-            speed: BASE_SPEED - 40
-        },
-        {
-            title: "Level 6: Getting Faster",
-            intro: "Speed it up a little...",
-            walls: 0.05,       // 5% walls
-            aiSnakes: 2,
-            target: 12,
-            speed: BASE_SPEED - 50
-        },
-        {
-            title: "Level 7: Snake Party",
-            intro: "More snakes join the party...",
-            walls: 0.06,       // 6% walls
-            aiSnakes: 2,
-            target: 13,
-            speed: BASE_SPEED - 60
-        },
-        {
-            title: "Level 8: Maze Master",
-            intro: "Show your maze skills...",
-            walls: 0.07,       // 7% walls
-            aiSnakes: 2,
-            target: 15,
-            speed: BASE_SPEED - 70
-        },
-        {
-            title: "Level 9: Almost There",
-            intro: "The end is near...",
-            walls: 0.08,       // 8% walls
-            aiSnakes: 3,
-            target: 17,
-            speed: BASE_SPEED - 80
-        },
-        {
-            title: "Level 10: Snake Champion",
-            intro: "The final challenge...",
-            walls: 0.1,        // 10% walls
-            aiSnakes: 3,
-            target: 20,
-            speed: BASE_SPEED - 90
+            speed: BASE_SPEED - 30
         }
     ];
 
     // Enhanced story chapters with more engaging narrative
     const STORY_CHAPTERS = [
         {
-            title: "Chapter 1: The Awakening",
-            intro: "In the digital realm of Byteland, you are a young snake chosen by the ancient code. Your journey to become the legendary Cyber Serpent begins...",
+            title: "Chapter 1: The Beginning",
+            intro: "Your journey begins as a young snake in the digital world...",
             missions: [
                 {
-                    text: "Master basic movement: Collect 3 energy cores (food) without hitting walls",
-                    target: 3,
-                    type: 'food',
-                    reward: "Speed Control unlocked!",
-                    walls: 0,
-                    aiSnakes: 0,
-                    speed: BASE_SPEED
-                },
-                {
-                    text: "Test your agility: Reach length 6 while avoiding obstacles",
-                    target: 6,
-                    type: 'length',
-                    reward: "Ghost Mode unlocked! (Press G to phase through walls once)",
-                    walls: 0.02,
-                    aiSnakes: 0,
-                    speed: BASE_SPEED - 10
-                }
-            ]
-        },
-        {
-            title: "Chapter 2: The Rival Emerges",
-            intro: "A corrupted snake program threatens Byteland. You must grow stronger to protect your digital homeland...",
-            missions: [
-                {
-                    text: "Defeat the corrupted snake by eating its data cores",
-                    target: 2,
-                    type: 'ai_snake',
-                    reward: "Power Boost: Double points for each rival defeated!",
-                    walls: 0.03,
-                    aiSnakes: 1,
-                    speed: BASE_SPEED - 20
-                },
-                {
-                    text: "Grow your power: Reach length 10 while battling rivals",
-                    target: 10,
-                    type: 'length',
-                    reward: "Shield Power unlocked! (Press S for temporary invincibility)",
-                    walls: 0.04,
-                    aiSnakes: 2,
-                    speed: BASE_SPEED - 25
-                }
-            ]
-        },
-        {
-            title: "Chapter 3: The Digital Storm",
-            intro: "A virus storm approaches Byteland, corrupting everything in its path. Time to use all your abilities...",
-            missions: [
-                {
-                    text: "Navigate through the virus storm: Score 15 points in the chaos",
-                    target: 15,
-                    type: 'score',
-                    reward: "Time Slow unlocked! (Press T to slow down time)",
-                    walls: 0.05,
-                    aiSnakes: 2,
-                    speed: BASE_SPEED - 30
-                },
-                {
-                    text: "Save other snakes: Collect 5 power-ups while avoiding the storm",
+                    text: "Collect 5 food items to grow stronger",
                     target: 5,
-                    type: 'powerup',
-                    reward: "Multi-Core Processing: Collect multiple food items at once!",
-                    walls: 0.06,
-                    aiSnakes: 1,
-                    speed: BASE_SPEED - 35
-                }
-            ]
-        },
-        {
-            title: "Chapter 4: The Final Code",
-            intro: "The source of corruption has been found. Time to become the legendary Cyber Serpent...",
-            missions: [
-                {
-                    text: "Reach the core: Navigate through the firewall maze",
-                    target: 20,
-                    type: 'score',
-                    reward: "Ultimate Form unlocked: Rainbow Trail and Immunity!",
-                    walls: 0.07,
-                    aiSnakes: 3,
-                    speed: BASE_SPEED - 40
+                    type: 'food'
                 },
                 {
-                    text: "Final Battle: Defeat the Virus King",
-                    target: 25,
-                    type: 'boss',
-                    reward: "You are now the Guardian of Byteland!",
-                    walls: 0.08,
-                    aiSnakes: 1,
-                    speed: BASE_SPEED - 45,
-                    bossMode: true
+                    text: "Reach length 8 without hitting walls",
+                    target: 8,
+                    type: 'length'
                 }
             ]
         }
@@ -788,6 +1200,18 @@
             mode === 'free' ? 'block' : 'none';
     }
 
+    // Add this function to handle the TikToker selection
+    function checkTikToker() {
+        const genderSelect = document.getElementById('playerGender');
+        if (genderSelect.value === 'tiktoker') {
+            const gaySound = new Audio('gay.mp3');
+            gaySound.play()
+                .catch(error => console.log("Audio playback failed:", error));
+            alert("Congratulations! You've chosen to be a TikToker! 🎵");
+        }
+    }
+
+    // Update the startGame function
     function startGame(event) {
         event.preventDefault();
         if (!gameMode) {
@@ -795,29 +1219,24 @@
             return;
         }
 
-        if (gameMode === 'free' && !selectedDifficulty) {
-            alert('Please select a difficulty level!');
-            return;
-        }
-
-        // Add check for tiktoker gender
+        // Check for TikToker selection
         if (document.getElementById('playerGender').value === 'tiktoker') {
             const gaySound = new Audio('gay.mp3');
-            gaySound.play()
-                .catch(error => console.log("Audio playback failed:", error));
+            gaySound.play().catch(err => console.log('Sound play failed:', err));
+            alert("Congratulations! You've chosen to be a TikToker! 🎵");
         }
 
         playerData = {
             name: document.getElementById('playerName').value,
             gender: document.getElementById('playerGender').value,
-            reason: document.getElementById('playReason').value,
             mode: gameMode,
-            difficulty: selectedDifficulty,
-            enableAISnakes: document.getElementById('enableAISnakes').checked
+            difficulty: selectedDifficulty
         };
 
+        document.getElementById('displayName').textContent = playerData.name;
         document.getElementById('welcomeModal').style.display = 'none';
-        initializeGame();
+        
+        initializeLevelMode();
     }
 
     // Initialize the grid
@@ -1039,8 +1458,7 @@
         }
 
         // Check for collisions
-        if (grid[head.y][head.x].classList.contains('wall') ||
-            snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+        if (checkCollision(head)) {
             gameOver();
             return;
         }
@@ -1051,11 +1469,17 @@
 
         // Check for food
         if (head.x === food.x && head.y === food.y) {
+            // Play eat sound
+            if (isSoundEnabled) {
+                sounds.eat.play().catch(err => console.log('Sound play failed:', err));
+            }
+            
             score++;
             document.getElementById('score').textContent = score;
             placeFood();
-            // Check level completion after scoring
+            if (gameMode === 'levels') {
             checkLevelCompletion();
+            }
         } else {
             const tail = snake.pop();
             if (tail) {
@@ -1063,7 +1487,7 @@
             }
         }
 
-        // Update AI snakes if enabled
+        // Update enemies
         if (playerData.enableAISnakes) {
             requestAnimationFrame(() => {
                 aiSnakes.forEach(aiSnake => aiSnake.move());
@@ -1090,44 +1514,22 @@
         let completed = false;
         switch(mission.type) {
             case 'food':
-                if (score >= mission.target) completed = true;
-                break;
-            case 'ai_snake':
-                if (eatenAISnakes >= mission.target) completed = true;
+                completed = score >= mission.target;
                 break;
             case 'length':
-                if (snake.length >= mission.target) completed = true;
-                break;
-            case 'score':
-                if (score >= mission.target) completed = true;
-                break;
-            case 'time':
-                missionTimer++;
-                if (missionTimer >= mission.target) completed = true;
+                completed = snake.length >= mission.target;
                 break;
         }
 
         if (completed) {
-            // Show reward
-            showReward(mission.reward);
-            
-            // Apply rewards
-            applyReward(currentChapter, currentMission);
-
-            // Progress to next mission or chapter
             currentMission++;
             if (currentMission >= chapter.missions.length) {
                 currentChapter++;
                 currentMission = 0;
                 if (currentChapter < STORY_CHAPTERS.length) {
-                    setTimeout(() => {
                         showStoryDialog(STORY_CHAPTERS[currentChapter].intro, true);
-                    }, 2000);
                 } else {
-                    setTimeout(() => {
-                        showStoryDialog("Congratulations! You've completed the story and become the Snake Champion!", true);
-                        gameOver();
-                    }, 2000);
+                    showStoryDialog("Congratulations! You've completed the story!", true);
                 }
             } else {
                 showStoryDialog(chapter.missions[currentMission].text);
@@ -1219,7 +1621,8 @@
         if (isPaused) {
           clearInterval(gameInterval);
         } else {
-          startGameInterval(LEVELS[currentLevel - 1].speed);
+          const levelData = LEVELS[currentLevel - 1];
+          startGameInterval(levelData.speed);
         }
       }
     }
@@ -1238,29 +1641,43 @@
       // Clear any existing elements
       if (gameInterval) clearInterval(gameInterval);
       grid = [];
-      document.getElementById('game-container').innerHTML = '';
       
-      // Remove any existing UI elements
-      removeGameModeUI();
+      // Initialize grid
+      initializeGrid();
       
-      // Initialize based on game mode
-      switch(gameMode) {
-          case 'story':
-              initializeStoryMode();
-              break;
-          case 'levels':
-              initializeLevelMode();
-              break;
-          case 'free':
-              initializeFreeMode();
-              break;
+      // Generate maze based on game mode
+      generateMaze();
+      
+      // Initialize AI snakes if enabled
+      if (playerData.enableAISnakes) {
+      initializeAISnakes();
       }
       
-      initializeGrid();
-      generateMaze();
-      initializeAISnakes();
+      // Place initial food
       placeFood();
-      startGameInterval(LEVELS[currentLevel - 1].speed);
+      
+      // Set initial game state
+      score = 0;
+      document.getElementById('score').textContent = '0';
+      isGameOver = false;
+      isPaused = false;
+      waitingForStart = true;
+      gameStarted = false;
+      
+      // Start game interval based on mode/level
+      const speed = gameMode === 'free' ? 
+          BASE_SPEED - (selectedDifficulty === 'hard' ? 50 : selectedDifficulty === 'normal' ? 25 : 0) :
+          LEVELS[currentLevel - 1].speed;
+      
+      startGameInterval(speed);
+      
+      // Show appropriate UI elements based on game mode
+      if (gameMode === 'levels') {
+          showLevelTarget();
+      }
+      
+      showMissionBriefing(currentLevel);
+      updateHealthBars();
     }
 
     function initializeStoryMode() {
@@ -1292,29 +1709,19 @@
 
     function initializeLevelMode() {
         isGameOver = false;
-        isPaused = true;
+        isPaused = false;
         score = 0;
         currentLevel = 1;
         snake = [{ x: 1, y: 1 }];
         direction = 'RIGHT';
         
-        grid = [];
-        document.getElementById('game-container').innerHTML = '';
-        document.getElementById('score').textContent = '0';
-        
         initializeGrid();
-        const levelData = LEVELS[currentLevel - 1];
-        generateMaze();
-        initializeAISnakes();
         placeFood();
         
-        if (gameInterval) {
-            clearInterval(gameInterval);
-        }
-        gameInterval = setInterval(update, levelData.speed);
+        document.getElementById('score').textContent = '0';
+        document.getElementById('displayLevel').textContent = currentLevel;
         
         showLevelIntro();
-        showLevelTarget();
     }
 
     function initializeFreeMode() {
@@ -1347,8 +1754,8 @@
             <p>${level.intro}</p>
             <div class="level-requirements">
                 <p>Target Score: ${level.target}</p>
-                <p>Rival Snakes: ${level.aiSnakes}</p>
-                <p>Difficulty: ${getDifficultyRating(currentLevel)}</p>
+                <p>Use arrow keys to move</p>
+                <p>Collect food to score points</p>
             </div>
             <button onclick="startLevel()" class="button">Start Level</button>
         `;
@@ -1356,13 +1763,11 @@
     }
 
     function startLevel() {
-        // Remove the intro dialog
-        const dialog = document.querySelector('.level-dialog');
-        if (dialog) {
-            dialog.remove();
-        }
+        // Remove any dialogs
+        const dialogs = document.querySelectorAll('.level-dialog, .mission-overlay');
+        dialogs.forEach(dialog => dialog.remove());
         
-        // Reset start state but don't start moving yet
+        // Reset start state
         waitingForStart = true;
         gameStarted = false;
         isPaused = false;
@@ -1370,11 +1775,9 @@
         // Make sure snake is visible
         grid[1][1].classList.add('snake');
         
-        // Make sure the game interval is running
+        // Start game interval
         const levelData = LEVELS[currentLevel - 1];
-        if (!gameInterval) {
-            gameInterval = setInterval(update, levelData.speed);
-        }
+        startGameInterval(levelData.speed);
 
         // Show start instruction
         showMessage("Press any arrow key to start moving!");
@@ -1405,11 +1808,18 @@
 
     function gameOver() {
       isGameOver = true;
+        gameStarted = false; // Add this to prevent movement
+        clearInterval(gameInterval);
+        
+        // Play death sound
+        if (isSoundEnabled) {
+            sounds.die.play().catch(err => console.log('Sound play failed:', err));
+        }
+        
       if (score > highScore) {
         highScore = score;
         document.getElementById('highScore').textContent = highScore;
       }
-      clearInterval(gameInterval);
       showGameOver();
     }
 
@@ -1493,10 +1903,17 @@
         // Implement game speed update logic based on special abilities
     }
 
+    // Update the showLevelComplete function
     function showLevelComplete() {
+        clearInterval(gameInterval); // Stop the game
         isPaused = true;
-        playLevelCompleteSound(); // Play sound when level is completed
-
+        gameStarted = false;
+        
+        // Play level complete sound
+        const levelCompleteSound = new Audio('level-complete.mp3');
+        levelCompleteSound.play()
+            .catch(error => console.log("Audio playback failed:", error));
+        
         const dialog = document.createElement('div');
         dialog.className = 'level-complete';
         dialog.innerHTML = `
@@ -1509,69 +1926,51 @@
         document.body.appendChild(dialog);
     }
 
+    function checkLevelCompletion() {
+        const levelData = LEVELS[currentLevel - 1];
+        if (score >= levelData.target) {
+            clearInterval(gameInterval); // Stop the game
+            isPaused = true;
+            showLevelComplete();
+        }
+    }
+
     function nextLevel() {
-        const completeDialog = document.querySelector('.level-complete');
-        if (completeDialog) {
-            completeDialog.remove();
-        }
-
-        // Remove any existing target display
-        const existingTarget = document.querySelector('.level-target');
-        if (existingTarget) {
-            existingTarget.remove();
-        }
-
         currentLevel++;
-        
         if (currentLevel <= LEVELS.length) {
-            // Reset game state for next level
+            score = 0;
             snake = [{ x: 1, y: 1 }];
             direction = 'RIGHT';
-            score = 0;
-            document.getElementById('score').textContent = '0';
-            isPaused = true;  // Start paused to show level intro
-            isGameOver = false;
-            waitingForStart = true;
-            gameStarted = false;
             
-            // Clear the grid completely
-            grid.forEach(row => row.forEach(cell => {
-                cell.className = 'cell';
-            }));
-            
-            // Initialize new level
-            const levelData = LEVELS[currentLevel - 1];
-            if (gameInterval) {
-                clearInterval(gameInterval);
-            }
-            
-            // Set up new level
-            generateMaze();
-            
-            // Make sure snake is visible
-            grid[1][1].classList.add('snake');
-            
-            initializeAISnakes();
+            initializeGrid();
             placeFood();
             
-            // Show new level intro
+            document.getElementById('score').textContent = '0';
+            document.getElementById('displayLevel').textContent = currentLevel;
+            
             showLevelIntro();
-            showLevelTarget();
         } else {
             completeLevelMode();
         }
     }
 
     function completeLevelMode() {
-        playGameCompleteSound(); // Play special sound for game completion
+        clearInterval(gameInterval); // Stop the game
+        isGameOver = true;
+        gameStarted = false; // Add this to prevent movement
+        
+        // Play game complete sound
+        if (isSoundEnabled) {
+            sounds.gameComplete.play().catch(err => console.log('Sound play failed:', err));
+        }
         
         const dialog = document.createElement('div');
-        dialog.className = 'level-complete';
+        dialog.className = 'game-complete';
         dialog.innerHTML = `
             <h2>🎉 Congratulations! 🎉</h2>
             <p>You've completed all levels!</p>
-            <p>You are now a Snake Master!</p>
-            <button onclick="resetToMainMenu()" class="button">Main Menu</button>
+            <p>Final Score: ${score}</p>
+            <button onclick="resetToMainMenu()" class="button">Back to Menu</button>
         `;
         document.body.appendChild(dialog);
     }
@@ -1676,53 +2075,6 @@
         <div id="abilityDisplay" class="ability-display"></div>
     `;
 
-    // Add these styles
-    const storyStyles = `
-        .ability-display {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-        }
-
-        .story-mission {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-            animation: fadeIn 0.5s;
-        }
-
-        .boss-warning {
-            color: #ff4444;
-            font-size: 1.2em;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-    `;
-
-    // Add this function to check level completion
-    function checkLevelCompletion() {
-        const levelData = LEVELS[currentLevel - 1];
-        if (score >= levelData.target) {
-            isPaused = true;
-            showLevelComplete();
-        }
-    }
-
     // Add target score display
     function showLevelTarget() {
         const targetDisplay = document.createElement('div');
@@ -1788,50 +2140,212 @@
     `;
     document.body.insertAdjacentHTML('beforeend', soundButton);
 
-    // Add these styles
-    const audioStyles = `
-        .sound-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sound-toggle:hover {
-            transform: scale(1.1);
-            background: rgba(0, 0, 0, 0.9);
-        }
-
-        .level-complete {
-            animation: celebrateComplete 0.5s ease-out;
-        }
-
-        @keyframes celebrateComplete {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-    `;
-
-    // Add the styles to the document
-    const audioStyleSheet = document.createElement("style");
-    audioStyleSheet.textContent = audioStyles;
-    document.head.appendChild(audioStyleSheet);
-
     // Add debug function to check snake visibility
     function debugSnakePosition() {
         console.log('Snake positions:', snake);
         console.log('Snake head cell classes:', grid[snake[0].y][snake[0].x].className);
     }
+
+    // Initialize health and power-up system
+    let playerHealth = 100;
+    let maxPlayerHealth = 100;
+    let enemyHealth = 50;
+    let maxEnemyHealth = 50;
+    let activePowerUps = [];
+
+    function updateHealthBars() {
+      // Update player health
+      const playerFill = document.getElementById('playerHealthFill');
+      const playerText = document.getElementById('playerHealthText');
+      const playerPercentage = (playerHealth / maxPlayerHealth) * 100;
+      playerFill.style.width = `${playerPercentage}%`;
+      playerText.textContent = `${playerHealth}/${maxPlayerHealth}`;
+
+      // Update enemy health
+      const enemyFill = document.getElementById('enemyHealthFill');
+      const enemyText = document.getElementById('enemyHealthText');
+      const enemyPercentage = (enemyHealth / maxEnemyHealth) * 100;
+      enemyFill.style.width = `${enemyPercentage}%`;
+      enemyText.textContent = `${enemyHealth}/${maxEnemyHealth}`;
+    }
+
+    function addPowerUp(type) {
+      const slot = document.querySelector('.power-up-slot:not(.active)');
+      if (slot) {
+        slot.classList.add('active');
+        slot.setAttribute('data-power', type);
+        slot.style.backgroundImage = `url('assets/powers/${type}.png')`;
+        activePowerUps.push(type);
+      }
+    }
+
+    function showDamageEffect(x, y, amount) {
+      const effect = document.createElement('div');
+      effect.className = 'power-up-effect';
+      effect.textContent = `-${amount}`;
+      effect.style.left = `${x}px`;
+      effect.style.top = `${y}px`;
+      document.body.appendChild(effect);
+      setTimeout(() => effect.remove(), 1000);
+    }
+
+    // Update the collision detection to include combat
+    function handleCollision(snake1, snake2) {
+      if (snake1.isPlayer) {
+        // Player attacking enemy
+        enemyHealth -= combatMechanics.collision.damage;
+        showDamageEffect(snake2.x, snake2.y, combatMechanics.collision.damage);
+      } else {
+        // Enemy attacking player
+        playerHealth -= combatMechanics.collision.damage;
+        showDamageEffect(snake1.x, snake1.y, combatMechanics.collision.damage);
+      }
+      updateHealthBars();
+    }
+
+    // Add this after your existing variable declarations
+    const ENEMY_TYPES = {
+        basic: {
+            health: 50,
+            damage: 10,
+            speed: 0.3,
+            color: '#ff4444',
+            points: 100
+        },
+        poison: {
+            health: 75,
+            damage: 15,
+            speed: 0.4,
+            color: '#8e44ad',
+            points: 150
+        },
+        boss: {
+            health: 500,
+            damage: 25,
+            speed: 0.2,
+            color: '#c0392b',
+            points: 1000
+        }
+    };
+
+    // Add this function to spawn enemies
+    function spawnEnemies(level) {
+        enemies = []; // Clear existing enemies
+        
+        if (level === LEVELS.length) { // Boss level
+            const boss = new Enemy('boss', 
+                Math.floor(WIDTH / 2), 
+                Math.floor(HEIGHT / 2),
+                ENEMY_TYPES.boss.health,
+                ENEMY_TYPES.boss.damage,
+                ENEMY_TYPES.boss.speed
+            );
+            enemies.push(boss);
+            showMessage("⚠️ BOSS BATTLE! ⚠️");
+        } else {
+            // Regular levels
+            const enemyCount = Math.min(level + 1, 5); // Increase enemies per level
+            for (let i = 0; i < enemyCount; i++) {
+                const type = Math.random() > 0.7 ? 'poison' : 'basic';
+                const enemy = new Enemy(
+                    type,
+                    Math.floor(Math.random() * WIDTH),
+                    Math.floor(Math.random() * HEIGHT),
+                    ENEMY_TYPES[type].health,
+                    ENEMY_TYPES[type].damage,
+                    ENEMY_TYPES[type].speed
+                );
+                enemies.push(enemy);
+            }
+        }
+    }
+
+    // Add this function to show mission briefing
+    function showMissionBriefing(level) {
+        const overlay = document.createElement('div');
+        overlay.className = 'mission-overlay';
+        
+        let missionText = '';
+        if (level === LEVELS.length) {
+            missionText = `
+                <h2>🔥 FINAL BOSS BATTLE 🔥</h2>
+                <p>The mighty boss snake has appeared!</p>
+                <ul>
+                    <li>Boss Health: 500</li>
+                    <li>Boss Damage: 25</li>
+                    <li>Collect health orbs to survive</li>
+                    <li>Use power-ups strategically</li>
+                </ul>
+                <div class="warning">This is your final test. Good luck!</div>
+            `;
+        } else {
+            missionText = `
+                <h2>Level ${level} Mission</h2>
+                <p>${LEVELS[level-1].intro}</p>
+                <ul>
+                    <li>Defeat ${Math.min(level + 1, 5)} enemy snakes</li>
+                    <li>Collect food for health (+10 HP)</li>
+                    <li>Avoid enemy attacks (${ENEMY_TYPES.basic.damage}-${ENEMY_TYPES.poison.damage} damage)</li>
+                    <li>Target Score: ${LEVELS[level-1].target}</li>
+                </ul>
+                <div class="tip">Tip: Ram into enemies to deal damage!</div>
+            `;
+        }
+        
+        overlay.innerHTML = `
+            ${missionText}
+            <button class="start-mission-btn">Begin Mission</button>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        overlay.querySelector('.start-mission-btn').onclick = () => {
+            overlay.remove();
+            isPaused = false;
+            gameStarted = true;
+            spawnEnemies(level);
+        };
+    }
+
+    // Add this function to place health orbs
+    function placeHealthOrb(x, y) {
+        const cell = grid[y][x];
+        cell.className = 'cell health-orb';
+        setTimeout(() => {
+            if (cell.classList.contains('health-orb')) {
+                cell.className = 'cell';
+            }
+        }, 5000); // Disappear after 5 seconds
+    }
+
+    function checkCollision(head) {
+        // Check wall collision
+        if (grid[head.y][head.x].classList.contains('wall')) {
+            return true;
+        }
+        
+        // Check self collision
+        return snake.some((segment, index) => {
+            return index !== 0 && segment.x === head.x && segment.y === head.y;
+        });
+    }
+
+    // Add these sound effects right after your script tag starts
+    const sounds = {
+        eat: new Audio('sounds/eat.mp3'),
+        die: new Audio('sounds/die.mp3'),
+        levelComplete: new Audio('sounds/level-complete.mp3'),
+        gameComplete: new Audio('sounds/game-complete.mp3')
+    };
+
+    // Add event listener for gender selection
+    document.getElementById('playerGender').addEventListener('change', function() {
+        if (this.value === 'tiktoker') {
+            const gaySound = new Audio('gay.mp3');
+            gaySound.play().catch(err => console.log('Sound play failed:', err));
+            alert("Congratulations! You've chosen to be a TikToker! 🎵");
+        }
+    });
   </script>
 </body>
 </html>
